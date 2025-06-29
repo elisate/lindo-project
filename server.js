@@ -2,10 +2,10 @@ import express, { json } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-// import Docrouter from "./src/Docs/Swagger.js";
+import DocRouter from "./Documentation/Swagger.js";
 import cors from "cors";
 
-  import mainRouter from "./routes/indexRouting.js";
+import mainRouter from "./routes/indexRouting.js";
 dotenv.config();
 const app = express();
 
@@ -22,7 +22,6 @@ const corsOptions = {
   credentials: true, // Allow cookies & authentication headers
 };
 
-
 // Use CORS middleware with options
 app.use(cors(corsOptions));
 
@@ -35,6 +34,8 @@ mongoose
     console.log("Connected to MongoDB");
     app.listen(port, () => {
       console.log(`Node API is running on port http://localhost:${port}`);
+      console.log(   `Doc for swagger http://localhost:${port}/api-docs`);
+   
     });
   })
   .catch((error) => {
@@ -44,5 +45,5 @@ mongoose
 // Routes / Endpoints
 app.use(bodyParser.json());
 
-// app.use("/api-docs", Docrouter);
-app.use("/",mainRouter);
+app.use("/", mainRouter);
+app.use("/api-docs", DocRouter);
