@@ -1,9 +1,16 @@
 import Product from '../models/productModel.js';
 import Category from '../models/categoryModel.js';
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // 📌 Create a new product
 export const addOrUpdateProduct = async (req, res) => {
   try {
+     const result = await cloudinary.uploader.upload(req.files.image[0].path);
     const {
       name,
       description,
@@ -14,6 +21,7 @@ export const addOrUpdateProduct = async (req, res) => {
       shippingInfo
     } = req.body;
 
+    const image = result.secure_url;
     // ✅ 1. Ensure user is authenticated (from Auth middleware)
     const user = req.user;
     if (!user) {
@@ -46,6 +54,7 @@ export const addOrUpdateProduct = async (req, res) => {
 
     // 🆕 Create new product
     const newProduct = new Product({
+      image,
       name,
       description,
       price,

@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const ProductSchema = new Schema({
+   image: {
+      type:Array,
+      required: true,
+    },
   name: {
     type: String,
     required: true
