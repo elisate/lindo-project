@@ -2,11 +2,18 @@ import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
 import dotenv from "dotenv";
 import { generateAccessToken } from "../utils/generateUserTokens.js";
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 dotenv.config();
 
 export const register = async (req, res) => {
   try {
     const { firstName, lastName, email, gender, password, role } = req.body;
+    const result = await cloudinary.uploader.upload(req.files.image[0].path);
 
     // Check if the email already exists
     const existingUser = await User.findOne({ email });
@@ -16,8 +23,10 @@ export const register = async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+    const image=result.secure_url;
 
     const user = new User({
+      image,
       firstName,
       lastName,
       email,

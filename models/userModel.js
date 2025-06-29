@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema(
       enum: ["vendor", "user",],
       default:"user"
     },
-    images: {
+    image: {
       type: Array,
       required: false,
     },
