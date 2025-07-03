@@ -1,5 +1,6 @@
 import Product from '../models/productModel.js';
 import Category from '../models/categoryModel.js';
+
 import { v2 as cloudinary } from "cloudinary";
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,9 +9,27 @@ cloudinary.config({
 });
 
 // 📌 Create a new product
+
+
 export const addOrUpdateProduct = async (req, res) => {
   try {
-     const result = await cloudinary.uploader.upload(req.files.image[0].path);
+    // ✅ 1) Get uploaded files (must match your Multer field name)
+    const files = req.files?.image || []; // or `images` if you renamed it
+
+    if (files.length === 0) {
+      return res.status(400).json({ message: "Please upload at least one image" });
+    }
+
+    // ✅ 2) Upload all images to Cloudinary and collect URLs
+    const uploadedImages = [];
+    for (const file of files) {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "products_gallery",
+      });
+      uploadedImages.push(result.secure_url);
+    }
+
+    // ✅ 3) Extract other product fields
     const {
       name,
       description,
@@ -18,64 +37,54 @@ export const addOrUpdateProduct = async (req, res) => {
       category,
       stockType,
       quantity,
-      shippingInfo
+      shippingProvider,
+      estimatedDeliveryDays,
     } = req.body;
 
-    const image = result.secure_url;
-    // ✅ 1. Ensure user is authenticated (from Auth middleware)
-    const user = req.user;
-    if (!user) {
-      return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
-    }
-
-    // ✅ 2. Validate category
+    // ✅ 4) Validate category
     const existingCategory = await Category.findById(category);
     if (!existingCategory) {
-      return res.status(400).json({ message: 'Invalid category selected.' });
+      return res.status(400).json({ message: "Invalid category selected." });
     }
 
-    // ✅ 3. Check if product already exists (same name, category, stockType)
-    const existingProduct = await Product.findOne({
-      name,
-      category,
-      stockType
-    });
-
+    // ✅ 5) (Optional) Check for duplicate product
+    const existingProduct = await Product.findOne({ name, category, stockType });
     if (existingProduct) {
-      // 🔁 Update quantity
-      existingProduct.quantity += Number(quantity); // Ensure it's a number
+      existingProduct.quantity += Number(quantity) || 0;
       await existingProduct.save();
-
       return res.status(200).json({
-        message: `Product already exists. Quantity increased by ${quantity}.`,
-        product: existingProduct
+        message: "Product exists, quantity updated",
+        product: existingProduct,
       });
     }
 
-    // 🆕 Create new product
+    // ✅ 6) Create new product
     const newProduct = new Product({
-      image,
+      image: uploadedImages, // ✅ Array of URLs!
       name,
       description,
       price,
       category,
       stockType,
-      quantity: Number(quantity),
-      shippingInfo: stockType === 'virtual_stock' ? shippingInfo : undefined
+      quantity: Number(quantity) || 0,
+      shippingInfo: {
+        provider: shippingProvider || null,
+        estimatedDeliveryDays: estimatedDeliveryDays || null,
+      },
     });
 
     await newProduct.save();
 
     return res.status(201).json({
-      message: 'New product created',
-      product: newProduct
+      message: "Product created successfully with multiple images",
+      product: newProduct,
     });
 
   } catch (error) {
-    console.error('AddOrUpdateProduct Error:', error.message);
+    console.error("AddOrUpdateProduct Error:", error);
     res.status(500).json({
-      message: 'Internal server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -173,3 +182,86 @@ export const getProductsByStockType = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+
+// export const createProduct = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       description,
+//       price,
+//       category,
+//       stockType,
+//       quantity,
+//       shippingInfo
+//     } = req.body;
+
+//     // ✅ 1. Auth check
+//     const user = req.user;
+//     if (!user) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+
+//     // ✅ 2. Validate category
+//     const existingCategory = await Category.findById(category);
+//     if (!existingCategory) {
+//       return res.status(400).json({ message: "Invalid category" });
+//     }
+
+//     // ✅ 3. Check if product exists
+//     let product = await Product.findOne({ name, category, stockType });
+
+//     if (product) {
+//       // Update quantity
+//       product.quantity += Number(quantity);
+//     } else {
+//       // Create new product
+//       product = new Product({
+//         name,
+//         description,
+//         price,
+//         category,
+//         stockType,
+//         quantity: Number(quantity),
+//         shippingInfo:
+//           stockType === "virtual_stock" ? shippingInfo : undefined,
+//         gallery: [],
+//       });
+//     }
+
+//     // ✅ 4. Upload images if any
+//     if (req.files && req.files.images) {
+//       const images = req.files.images;
+//       for (const file of images) {
+//         const result = await cloudinary.uploader.upload(file.path, {
+//           folder: "product_gallery",
+//         });
+
+//         const galleryItem = new Gallery({
+//           product: product._id, // For new product this will be null at first
+//           imageUrl: result.secure_url,
+//         });
+
+//         await galleryItem.save();
+//         product.gallery.push(galleryItem._id);
+//       }
+//     }
+
+//     await product.save();
+
+//     // ✅ 5. If new product, update gallery's product ID now that product._id exists
+//     if (!product._id) {
+//       await Gallery.updateMany({ product: null }, { product: product._id });
+//     }
+
+//     res.status(201).json({
+//       message: product.isNew
+//         ? "New product created"
+//         : "Product updated",
+//       product,
+//     });
+//   } catch (error) {
+//     console.error("AddOrUpdateProduct Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
