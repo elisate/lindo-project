@@ -5,10 +5,10 @@ import { createCategory,updateCategory,getAllCategories
 import { Auth } from "../utils/jwtFunction.js";
 import { vendor } from "../middlewares/AdminAcess.js";
 const categoryRouter=express();
-categoryRouter.post("/createCategory",Auth,vendor,createCategory);
-categoryRouter.get("/getAllCategories",Auth,vendor,getAllCategories);
-categoryRouter.put("/updateCategoryById",Auth,vendor,updateCategory);
-categoryRouter.get("/deleteCategory",Auth,vendor,deleteCategory)
-categoryRouter.get("/getCategoryByIg",Auth,vendor,getCategoryById)
+categoryRouter.post("/createCategory",createCategory);
+categoryRouter.get("/getAllCategories",getAllCategories);
+categoryRouter.put("/updateCategoryById",updateCategory);
+categoryRouter.get("/deleteCategory",deleteCategory)
+categoryRouter.get("/getCategoryByIg",getCategoryById)
 
 export default categoryRouter;

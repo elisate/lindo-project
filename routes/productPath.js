@@ -14,10 +14,10 @@ import configureMulter from "../utils/multer.js";
 const upload=configureMulter();
 
 const productRouter = express();
-productRouter.post("/createProduct", Auth,vendor,upload,addOrUpdateProduct);
+productRouter.post("/createProduct", upload,addOrUpdateProduct);
 productRouter.get("/getAllProduct", getAllProducts);
-productRouter.delete("/deleteProductById",Auth,vendor,deleteProduct);
-productRouter.put("/updateProductById",Auth,vendor,updateProduct);
+productRouter.delete("/deleteProductById",deleteProduct);
+productRouter.put("/updateProductById",updateProduct);
 
 
 
