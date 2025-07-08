@@ -7,8 +7,8 @@ import {
   deleteProduct,
 
 } from "../controllers/productController.js";
-import { Auth } from "../utils/jwtFunction.js";
-import { vendor } from "../middlewares/AdminAcess.js";
+// import { Auth } from "../utils/jwtFunction.js";
+// import { vendor } from "../middlewares/AdminAcess.js";
 import configureMulter from "../utils/multer.js";
 
 const upload=configureMulter();

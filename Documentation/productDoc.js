@@ -1,17 +1,15 @@
-
-
 /**
  * @swagger
  * tags:
- *   name: Products
- *   description: Product management endpoints
+ *   - name: Products
+ *     description: Endpoints for product management
  */
 
 /**
  * @swagger
  * /product/createProduct:
  *   post:
- *     summary: Add or update a product
+ *     summary: Add a new product
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
@@ -21,40 +19,52 @@
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - image
+ *               - name
+ *               - price
+ *               - category
  *             properties:
  *               image:
- *                 type: string
- *                 format: binary
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *               name:
  *                 type: string
+ *                 example: iPhone 15 Pro Max
  *               description:
  *                 type: string
+ *                 example: Latest Apple smartphone
  *               price:
  *                 type: number
+ *                 example: 1299.99
  *               category:
  *                 type: string
  *               stockType:
  *                 type: string
  *                 enum: [in_store, virtual_stock]
  *               quantity:
- *                 type: number
+ *                 type: integer
  *               shippingInfo:
  *                 type: object
  *                 properties:
  *                   provider:
  *                     type: string
+ *                     example: DHL
  *                   estimatedDeliveryDays:
  *                     type: integer
+ *                     example: 3
  *     responses:
  *       201:
- *         description: Product created or updated
+ *         description: Product created successfully
  *       500:
  *         description: Internal server error
  */
 
 /**
  * @swagger
- * /product/getAllProduct:
+ * /product/getAllProducts:
  *   get:
  *     summary: Get all products
  *     tags: [Products]
@@ -62,17 +72,54 @@
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of all products
+ *         description: List of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   price:
+ *                     type: number
+ *                   category:
+ *                     type: string
+ *                   stockType:
+ *                     type: string
+ *                   quantity:
+ *                     type: integer
+ *                   shippingInfo:
+ *                     type: object
+ *                     properties:
+ *                       provider:
+ *                         type: string
+ *                       estimatedDeliveryDays:
+ *                         type: integer
+ *       500:
+ *         description: Internal server error
  */
 
 /**
  * @swagger
- * /product/updateProductById:
+ * /product/updateProductById/{id}:
  *   put:
- *     summary: Update product by ID
+ *     summary: Update an existing product by ID
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The product ID
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -80,8 +127,6 @@
  *           schema:
  *             type: object
  *             properties:
- *               id:
- *                 type: string
  *               name:
  *                 type: string
  *               description:
@@ -94,7 +139,7 @@
  *                 type: string
  *                 enum: [in_store, virtual_stock]
  *               quantity:
- *                 type: number
+ *                 type: integer
  *               shippingInfo:
  *                 type: object
  *                 properties:
@@ -104,29 +149,33 @@
  *                     type: integer
  *     responses:
  *       200:
- *         description: Product updated
+ *         description: Product updated successfully
  *       404:
  *         description: Product not found
+ *       500:
+ *         description: Internal server error
  */
 
 /**
  * @swagger
- * /product/deleteProductById:
+ * /product/deleteProductById/{id}:
  *   delete:
- *     summary: Delete product by ID
+ *     summary: Delete a product by ID
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: id
  *         required: true
- *         description: Product ID
+ *         description: The product ID
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Product deleted
+ *         description: Product deleted successfully
  *       404:
  *         description: Product not found
+ *       500:
+ *         description: Internal server error
  */
