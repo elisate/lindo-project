@@ -91,18 +91,21 @@ export const login = async (req, res) => {
 };
 
 // CRUD Operations
-
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.json({ count: users.length, users });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch users", error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message,
+    });
   }
 };
 
+// ------------------------------
+// Get single user by ID
+// ------------------------------
 export const getUserById = async (req, res) => {
   const userId = req.params.id;
 
@@ -113,43 +116,25 @@ export const getUserById = async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch user", error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch user",
+      error: error.message,
+    });
   }
 };
 
-
-
-export const deleteUser = async (req, res) => {
-  const userId = req.params.id;
-
-  try {
-    const user = await User.findByIdAndDelete(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({ message: "User deleted successfully", user });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to delete user", error: error.message });
-  }
-};
-
-
+// ------------------------------
+// Update user
+// ------------------------------
 export const updateUser = async (req, res) => {
   const userId = req.params.id;
   const updates = req.body;
 
   try {
-    // Check if a file is uploaded
-    if (req.file) {
-      const imagePath = req.file.path;
-      if (!updates.images) updates.images = [];
-      updates.images.push(imagePath);
+    // If a new image is uploaded, update it on Cloudinary
+    if (req.files && req.files.image && req.files.image[0]) {
+      const result = await cloudinary.uploader.upload(req.files.image[0].path);
+      updates.image = result.secure_url;
     }
 
     const user = await User.findByIdAndUpdate(userId, updates, { new: true });
@@ -158,9 +143,38 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "User updated successfully", user });
+    res.json({
+      message: "User updated successfully",
+      user,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update user", error: error.message });
+    res.status(500).json({
+      message: "Failed to update user",
+      error: error.message,
+    });
   }
 };
 
+// ------------------------------
+// Delete user
+// ------------------------------
+export const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "User deleted successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete user",
+      error: error.message,
+    });
+  }
+};
