@@ -16,8 +16,8 @@ const upload=configureMulter();
 const productRouter = express();
 productRouter.post("/createProduct", upload,addOrUpdateProduct);
 productRouter.get("/getAllProduct", getAllProducts);
-productRouter.delete("/deleteProductById",deleteProduct);
-productRouter.put("/updateProductById",updateProduct);
+productRouter.delete("/deleteProductById/:id",deleteProduct);
+productRouter.put("/updateProductById/:id",updateProduct);
 
 
 
