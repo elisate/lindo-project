@@ -50,7 +50,7 @@
 
 /**
  * @swagger
- * /api/banner/createBanner:
+ * /banner/createBanner:
  *   post:
  *     summary: Create a new banner
  *     tags: [Banners]
@@ -94,7 +94,7 @@
 
 /**
  * @swagger
- * /api/banner/{bannerId}/products:
+ * /banner/{bannerId}/products:
  *   get:
  *     summary: Get all products for a banner's category
  *     tags: [Banners]
