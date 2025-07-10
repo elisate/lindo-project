@@ -179,3 +179,27 @@
  *       500:
  *         description: Internal server error
  */
+
+
+/**
+ * @swagger
+ * /product/getProductsByCreationDate:
+ *   get:
+ *     summary: Get all products sorted by creation date
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order ('asc' for oldest first, 'desc' for newest first)
+ *     responses:
+ *       200:
+ *         description: List of products sorted by creation date
+ *       400:
+ *         description: Invalid order value
+ *       500:
+ *         description: Internal server error
+ */

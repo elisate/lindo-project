@@ -185,6 +185,7 @@ export const getProductsByStockType = async (req, res) => {
 
 
 // export const createProduct = async (req, res) => {
+
 //   try {
 //     const {
 //       name,
@@ -265,3 +266,29 @@ export const getProductsByStockType = async (req, res) => {
 //     res.status(500).json({ message: error.message });
 //   }
 // };
+
+// 📌 Get products sorted by createdAt
+export const getProductsByCreationDate = async (req, res) => {
+  try {
+    // Get optional `order` query param: 'asc' or 'desc'
+    const { order = 'desc' } = req.query;
+
+    // Validate order value
+    if (!['asc', 'desc'].includes(order)) {
+      return res.status(400).json({ message: "Invalid order value. Use 'asc' or 'desc'." });
+    }
+
+    // Find all products sorted by createdAt
+    const products = await Product.find()
+      .sort({ createdAt: order === 'asc' ? 1 : -1 })
+      .populate('category');
+
+    res.status(200).json({
+      message: `Products sorted by createdAt (${order})`,
+      products,
+    });
+  } catch (error) {
+    console.error("getProductsByCreationDate Error:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
