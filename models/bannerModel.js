@@ -7,7 +7,10 @@ const BannerSchema = new Schema({
     type: String,
     required: false,
   },
-
+ subTitle: {
+    type: String,
+    required: false,
+  },
   images: {
     type: [String],
     required: true
