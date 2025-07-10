@@ -2,7 +2,47 @@
  * @swagger
  * tags:
  *   - name: Categories
- *     description: Endpoints for managing categories
+ *     description: Endpoints for managing product categories
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Category:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Auto-generated MongoDB ID.
+ *         name:
+ *           type: string
+ *           description: Name of the category.
+ *         description:
+ *           type: string
+ *           description: Description of the category.
+ *         image:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Array of image URLs for the category.
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Date and time the category was created.
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Date and time the category was last updated.
+ *       example:
+ *         _id: "60f6b5c4f1a4f72a4c8b1234"
+ *         name: "Electronics"
+ *         description: "Products related to electronic devices."
+ *         image:
+ *           - "https://res.cloudinary.com/your-cloud/image/upload/sample1.jpg"
+ *           - "https://res.cloudinary.com/your-cloud/image/upload/sample2.jpg"
+ *         createdAt: "2024-07-10T08:00:00Z"
+ *         updatedAt: "2024-07-10T08:05:00Z"
  */
 
 /**
@@ -16,7 +56,7 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -24,17 +64,27 @@
  *             properties:
  *               name:
  *                 type: string
- *                 example: Electronics
+ *                 description: Name of the category.
  *               description:
  *                 type: string
- *                 example: Products related to electronic devices
+ *                 description: Description of the category.
+ *               image:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: One or more image files to upload.
  *     responses:
  *       201:
- *         description: Category created successfully
+ *         description: Category created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Category'
  *       400:
- *         description: Category already exists or invalid data
+ *         description: Category already exists or invalid input.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */
 
 /**
@@ -47,22 +97,15 @@
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: A list of categories
+ *         description: A list of all categories.
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                   name:
- *                     type: string
- *                   description:
- *                     type: string
+ *                 $ref: '#/components/schemas/Category'
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */
 
 /**
@@ -77,27 +120,20 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: The unique ID of the category
+ *         description: The unique ID of the category.
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Category details
+ *         description: Category details.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 _id:
- *                   type: string
- *                 name:
- *                   type: string
- *                 description:
- *                   type: string
+ *               $ref: '#/components/schemas/Category'
  *       404:
- *         description: Category not found
+ *         description: Category not found.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */
 
 /**
@@ -112,29 +148,39 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: The unique ID of the category
+ *         description: The unique ID of the category.
  *         schema:
  *           type: string
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               name:
  *                 type: string
- *                 example: Updated Category Name
+ *                 description: Updated name.
  *               description:
  *                 type: string
- *                 example: Updated description
+ *                 description: Updated description.
+ *               image:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: One or more new images.
  *     responses:
  *       200:
- *         description: Category updated successfully
+ *         description: Category updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Category'
  *       404:
- *         description: Category not found
+ *         description: Category not found.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */
 
 /**
@@ -149,14 +195,14 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: The unique ID of the category
+ *         description: The unique ID of the category.
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Category deleted successfully
+ *         description: Category deleted successfully.
  *       404:
- *         description: Category not found
+ *         description: Category not found.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */

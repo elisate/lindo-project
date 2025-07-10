@@ -3,6 +3,13 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const CategorySchema = new Schema({
+
+  image: {
+    type: [String],
+    required: false,
+
+  },
+  
   name: {
     type: String,
     required: true,

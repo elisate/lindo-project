@@ -1,16 +1,37 @@
 import Category from "../models/categoryModel.js";
 
 // Create a new category
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 export const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
+     const files = req.files?.image || []; // or `images` if you renamed it
+    
+        if (files.length === 0) {
+          return res.status(400).json({ message: "Please upload at least one image" });
+        }
+    
+        // ✅ 2) Upload all images to Cloudinary and collect URLs
+        const uploadedImages = [];
+        for (const file of files) {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "products_gallery",
+          });
+          uploadedImages.push(result.secure_url);
+        }
 
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
       return res.status(400).json({ message: 'Category already exists.' });
     }
 
-    const category = new Category({ name, description });
+    const category = new Category({ name, description,image:uploadedImages });
     await category.save();
 
     res.status(201).json({ message: 'Category created successfully', category });
