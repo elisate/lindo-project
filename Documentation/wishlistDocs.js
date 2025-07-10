@@ -118,3 +118,28 @@
  *       500:
  *         description: Internal server error.
  */
+
+
+/**
+ * @swagger
+ * /wishlist/deleteWishlistProduct/{productId}:
+ *   delete:
+ *     summary: Remove a specific product from the user's wishlist
+ *     tags: [Wishlist]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to remove from the wishlist.
+ *     responses:
+ *       200:
+ *         description: Product removed from wishlist.
+ *       404:
+ *         description: Wishlist or product not found.
+ *       500:
+ *         description: Internal server error.
+ */

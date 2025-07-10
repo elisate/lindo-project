@@ -71,3 +71,33 @@ export const getUserWishlistProducts = async (req, res) => {
 };
 
 
+export const deleteWishlistProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const userId = req.user._id;
+
+    const wishlist = await Wishlist.findOne({ user: userId });
+
+    if (!wishlist) {
+      return res.status(404).json({ message: 'Wishlist not found.' });
+    }
+
+    const index = wishlist.products.indexOf(productId);
+
+    if (index === -1) {
+      return res.status(404).json({ message: 'Product not found in wishlist.' });
+    }
+
+    wishlist.products.splice(index, 1);
+    await wishlist.save();
+
+    res.status(200).json({
+      message: 'Product removed from wishlist.',
+      wishlist,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};

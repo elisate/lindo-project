@@ -8,5 +8,6 @@ const wishlistRouter = express();
 
 wishlistRouter.post("/toggleWishlistProduct", Auth, toggleWishlistProduct);
 wishlistRouter.get("/getUserWishlistProducts/:userId", Auth, getUserWishlistProducts);
+wishlistRouter.delete("/deleteWishlistProduct/:productId", Auth, deleteWishlistProduct); // ✅ Add this
 
 export default wishlistRouter;
