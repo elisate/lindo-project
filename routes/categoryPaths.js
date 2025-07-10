@@ -10,7 +10,7 @@ const upload=configureMulter();
 const categoryRouter=express();
 categoryRouter.post("/createCategory",upload,createCategory);
 categoryRouter.get("/getAllCategories",getAllCategories);
-categoryRouter.put("/updateCategoryById/:id",updateCategory);
+categoryRouter.put("/updateCategoryById/:id",upload,updateCategory);
 categoryRouter.delete("/deleteCategory",deleteCategory)
 categoryRouter.get("/getCategoryByIg/:id",getCategoryById)
 

@@ -137,6 +137,7 @@
  */
 
 /**
+/**
  * @swagger
  * /category/updateCategoryById/{id}:
  *   put:
@@ -161,9 +162,11 @@
  *               name:
  *                 type: string
  *                 description: Updated name.
+ *                 example: Electronics
  *               description:
  *                 type: string
  *                 description: Updated description.
+ *                 example: Products related to electronic devices.
  *               image:
  *                 type: array
  *                 items:
@@ -176,13 +179,36 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Category'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Category updated
+ *                 category:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     image:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                         description: URL of the uploaded image.
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
  *       404:
  *         description: Category not found.
  *       500:
  *         description: Internal server error.
  */
-
 /**
  * @swagger
  * /category/deleteCategory/{id}:

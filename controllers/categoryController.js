@@ -66,13 +66,31 @@ export const getCategoryById = async (req, res) => {
 };
 
 // Update a category by ID
+// Update a category by ID
 export const updateCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
+    // Prepare the update payload
+    const updateData = { name, description };
+
+    // ✅ Handle image upload if new images are provided
+    const files = req.files?.image || [];
+    if (files.length > 0) {
+      const uploadedImages = [];
+      for (const file of files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "categories_gallery",
+        });
+        uploadedImages.push(result.secure_url);
+      }
+      updateData.image = uploadedImages; // overwrite old images with new ones
+    }
+
+    // ✅ Update the category
     const category = await Category.findByIdAndUpdate(
       req.params.id,
-      { name, description },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -82,9 +100,11 @@ export const updateCategory = async (req, res) => {
 
     res.status(200).json({ message: 'Category updated', category });
   } catch (error) {
+    console.error('updateCategory Error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 // Delete a category by ID
 export const deleteCategory = async (req, res) => {
