@@ -18,7 +18,7 @@ const productRouter = express();
 productRouter.post("/createProduct", upload,addOrUpdateProduct);
 productRouter.get("/getAllProduct", getAllProducts);
 productRouter.delete("/deleteProductById/:id",deleteProduct);
-productRouter.put("/updateProductById/:id",updateProduct);
+productRouter.put("/updateProductById/:id",upload,updateProduct);
 productRouter.get("/getProductsByCreationDate",getProductsByCreationDate)
 
 

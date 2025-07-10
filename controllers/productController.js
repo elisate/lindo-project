@@ -115,18 +115,36 @@ export const getProductById = async (req, res) => {
 // 📌 Update product by ID
 export const updateProduct = async (req, res) => {
   try {
-    const { name, description, price, category, stockType, quantity, shippingInfo } = req.body;
+    const { name, description, price, category, stockType, quantity, shippingProvider, estimatedDeliveryDays } = req.body;
 
     const updateData = { name, description, price, category, stockType };
 
+    // ✅ Handle stockType logic
     if (stockType === 'in_store') {
       updateData.quantity = quantity;
       updateData.shippingInfo = undefined;
     } else if (stockType === 'virtual_stock') {
-      updateData.shippingInfo = shippingInfo;
+      updateData.shippingInfo = {
+        provider: shippingProvider || null,
+        estimatedDeliveryDays: estimatedDeliveryDays || null,
+      };
       updateData.quantity = undefined;
     }
 
+    // ✅ Handle image upload if new images are provided
+    const files = req.files?.image || [];
+    if (files.length > 0) {
+      const uploadedImages = [];
+      for (const file of files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "products_gallery",
+        });
+        uploadedImages.push(result.secure_url);
+      }
+      updateData.image = uploadedImages; // ✅ overwrite old images with new ones
+    }
+
+    // ✅ Update the product by ID
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       updateData,
@@ -134,15 +152,18 @@ export const updateProduct = async (req, res) => {
     );
 
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
-    res.status(200).json({ message: 'Product updated successfully', product });
+    res.status(200).json({
+      message: "Product updated successfully",
+      product,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("updateProduct Error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 // 📌 Delete product by ID
 export const deleteProduct = async (req, res) => {
   try {
