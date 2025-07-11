@@ -19,18 +19,22 @@ passport.use(
 
         let user = await User.findOne({ email });
 
-        if (!user) {
-          user = await User.create({
-            firstName: profile.name.givenName || "N/A",
-            lastName: profile.name.familyName || "N/A",
-            email: email,
-            password: "google-oauth", // Dummy or random string
-            gender: "N/A", // If you don’t have it
-            image: [profile.photos[0].value],
-            verified: true,
-            role: "user",
-          });
+        if (user) {
+          // ✅ If found, log them in.
+          return done(null, user);
         }
+
+        // ✅ If not found, create new
+        user = await User.create({
+          firstName: profile.name.givenName || "N/A",
+          lastName: profile.name.familyName || "N/A",
+          email: email,
+          password: "google-oauth",
+          gender: "N/A",
+          image: [profile.photos[0].value],
+          verified: true,
+          role: "user",
+        });
 
         return done(null, user);
       } catch (err) {
@@ -40,8 +44,10 @@ passport.use(
   )
 );
 
+
+// ✅ Session serialization
 passport.serializeUser((user, done) => {
-  done(null, user.id); // Store only the user ID
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {

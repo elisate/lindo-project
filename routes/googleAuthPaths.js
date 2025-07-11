@@ -6,7 +6,7 @@ const googleRouter = express.Router();
 
 
 googleRouter.get("/google", googleAuth); // Starts OAuth
-googleRouter.get("/google/callback", googleAuthCallback); // Handles callback
+googleRouter.get("/google/callback",googleAuthCallback); // Handles callback
 googleRouter.get("/logout", logout);
 
 export default googleRouter;
