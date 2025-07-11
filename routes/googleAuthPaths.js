@@ -5,7 +5,7 @@ import { googleAuth,googleAuthCallback,logout } from "../ExternalAuth/googleAuth
 const googleRouter = express.Router();
 
 
-googleRouter.get("/google", googleAuth); // Starts OAuth
+googleRouter.get("/google", googleAuth); // Starts OAuth // Authorization start here
 googleRouter.get("/google/callback",googleAuthCallback); // Handles callback
 googleRouter.get("/logout", logout);
 
