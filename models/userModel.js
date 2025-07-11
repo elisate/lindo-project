@@ -1,6 +1,7 @@
+// models/User.js
 import mongoose from "mongoose";
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -17,34 +18,31 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false, // Make optional for OAuth
     },
     gender: {
       type: String,
-      required: true,
+      required: false, // Make optional for OAuth
     },
-   
     role: {
       type: String,
       required: true,
-      enum: ["vendor", "user",],
-      default:"user"
+      enum: ["vendor", "user"],
+      default: "user",
     },
     image: {
       type: Array,
       required: false,
     },
-   
-
     tokens: {
       accessToken: { type: String },
       refreshToken: { type: String },
     },
-    verified: { type: Boolean, required: false },
+    verified: { type: Boolean, default: false },
     newPassword: {
       type: String,
       required: false,
-      select: false, 
+      select: false,
     },
     otp: {
       type: String,

@@ -6,6 +6,8 @@ import DocRouter from "./Documentation/Swagger.js";
 import cors from "cors";
 
 import mainRouter from "./routes/indexRouting.js";
+import session from "express-session";
+import passport from "./config/passportGoogle.js";
 dotenv.config();
 const app = express();
 
@@ -24,6 +26,19 @@ const corsOptions = {
 
 // Use CORS middleware with options
 app.use(cors(corsOptions));
+
+// ✅ Add session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "some_secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+//✅ Initialize passport session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Database connection
 const dbUri = `mongodb+srv://${dbUser}:${dbPass}@cluster0.hex2mmr.mongodb.net/${dbName}?retryWrites=true&w=majority`;
