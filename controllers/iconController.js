@@ -13,8 +13,14 @@ cloudinary.config({
 export const createIcon = async (req, res) => {
   try {
     const { title, categoryId } = req.body;
-    const files = req.files?.image || []; // or `images`
+    const files = req.files?.image || [];
 
+    // Validate title
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    // Validate category ID
     if (!categoryId) {
       return res.status(400).json({ message: "Category ID is required" });
     }
@@ -25,11 +31,12 @@ export const createIcon = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
+    // Validate files
     if (files.length === 0) {
       return res.status(400).json({ message: "Please upload at least one image" });
     }
 
-    // Upload images
+    // Upload images to Cloudinary
     const uploadedImages = [];
     for (const file of files) {
       const result = await cloudinary.uploader.upload(file.path, {
@@ -38,19 +45,28 @@ export const createIcon = async (req, res) => {
       uploadedImages.push(result.secure_url);
     }
 
+    // Create new Icon
     const newIcon = new Icon({
       title,
       image: uploadedImages,
-      category: category._id,
+      categoryId: category._id, // ✅ store properly under `categoryId`
     });
 
     const savedIcon = await newIcon.save();
-    res.status(201).json(savedIcon);
+
+    // Optionally populate category in response
+    const populatedIcon = await savedIcon.populate("categoryId");
+
+    res.status(201).json({
+      message: "Icon created successfully",
+      icon: populatedIcon,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("createIcon error:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // ✅ Get all Icons
 export const getIcons = async (req, res) => {
@@ -124,6 +140,35 @@ export const deleteIcon = async (req, res) => {
     }
     res.status(200).json({ message: "Icon deleted successfully" });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ Get the Category related to a single Icon
+export const getCategoryByIconId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the icon
+    const icon = await Icon.findById(id);
+    if (!icon) {
+      return res.status(404).json({ message: "Icon not found" });
+    }
+
+    // Make sure icon has a category
+    if (!icon.categoryId) {
+      return res.status(404).json({ message: "This Icon has no category" });
+    }
+
+    // Find the category
+    const category = await Category.findById(icon.categoryId);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.status(200).json(category);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
