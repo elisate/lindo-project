@@ -6,12 +6,14 @@ import cartRouter from "./cartPaths.js";
 import bannerRouter from "./bannerPaths.js";
 import wishlistRouter from "./wishlistPath.js";
 import googleRouter from "./googleAuthPaths.js";
+import addRouter from "./addPaths.js";
 const mainRouter=express.Router();
 mainRouter.use("/user",userRouter);
 mainRouter.use("/category",categoryRouter);
 mainRouter.use("/product",productRouter);
 mainRouter.use("/cart",cartRouter);
 mainRouter.use("/banner",bannerRouter);
-mainRouter.use("/wishlist",wishlistRouter)
-mainRouter.use("/auth",googleRouter)
+mainRouter.use("/wishlist",wishlistRouter);
+mainRouter.use("/auth",googleRouter);
+mainRouter.use("/adds",addRouter);
 export default mainRouter;
