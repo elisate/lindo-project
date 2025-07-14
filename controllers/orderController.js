@@ -51,3 +51,41 @@ export const createOrder = async (req, res) => {
     res.status(500).json({ message: "Internal server error while creating order." });
   }
 };
+
+export const getUserOrders = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const orders = await Order.find({ userId }).populate('items.productId', 'name price image');
+
+    if (!orders.length) {
+      return res.status(200).json({ message: "You have no orders yet.", orders: [] });
+    }
+
+    res.status(200).json({
+      message: "Orders retrieved successfully.",
+      orders
+    });
+
+  } catch (error) {
+    console.error("Get user orders error:", error);
+    res.status(500).json({ message: "Failed to retrieve user orders." });
+  }
+};
+
+// Optional: Admin - Get all orders
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find().populate('userId', 'firstName lastName email')
+                                     .populate('items.productId', 'name price');
+
+    res.status(200).json({
+      message: "All orders retrieved successfully.",
+      orders
+    });
+
+  } catch (error) {
+    console.error("Get all orders error:", error);
+    res.status(500).json({ message: "Failed to retrieve orders." });
+  }
+};
