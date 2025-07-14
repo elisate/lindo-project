@@ -38,7 +38,7 @@
 
 /**
  * @swagger
- * /cart/getCart:
+ * /cart/getCartByUserId:
  *   get:
  *     summary: Get the current user's cart
  *     tags: [Cart]
