@@ -8,6 +8,7 @@ import wishlistRouter from "./wishlistPath.js";
 import googleRouter from "./googleAuthPaths.js";
 import addRouter from "./addPaths.js";
 import iconRouter from "./iconPaths.js";
+import orderRouter from "./orderPaths.js";
 const mainRouter=express.Router();
 mainRouter.use("/user",userRouter);
 mainRouter.use("/category",categoryRouter);
@@ -18,4 +19,5 @@ mainRouter.use("/wishlist",wishlistRouter);
 mainRouter.use("/auth",googleRouter);
 mainRouter.use("/adds",addRouter);
 mainRouter.use("/icons",iconRouter)
+mainRouter.use("/orders",orderRouter)
 export default mainRouter;
