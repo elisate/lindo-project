@@ -1,9 +1,8 @@
 import { createOrder } from "../controllers/orderController.js";
-import express from "express"
+import express from "express";
 import { Auth } from "../utils/jwtFunction.js";
-const orderRouter=express();
+const orderRouter = express();
 
-orderRouter.post("/createOrder",Auth,createOrder);
-
+orderRouter.post("/createOrder", Auth, createOrder);
 
 export default orderRouter;
