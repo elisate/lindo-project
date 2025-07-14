@@ -5,28 +5,35 @@ import Product from "../models/productModel.js"
 export const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
-    const userId = req.user._id; // Make sure your auth middleware sets this
+    const userId = req.user._id;
 
+    // Validation
     if (!productId || !quantity || quantity < 1) {
       return res.status(400).json({ message: 'Product ID and valid quantity are required.' });
     }
 
+    // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found.' });
     }
 
+    // Find or create cart
     let cart = await Cart.findOne({ userId });
 
     if (!cart) {
       cart = new Cart({ userId, items: [] });
     }
 
-    const existingItem = cart.items.find(item => item.productId.equals(productId));
+    // Check if product already exists in cart
+    const existingItemIndex = cart.items.findIndex(item => item.productId.equals(productId));
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
+    if (existingItemIndex !== -1) {
+      // Product already in cart → increase quantity & update price
+      cart.items[existingItemIndex].quantity += quantity;
+      cart.items[existingItemIndex].price = product.price; // Optional: refresh price
     } else {
+      // New product → add to cart
       cart.items.push({
         productId,
         quantity,
@@ -36,13 +43,14 @@ export const addToCart = async (req, res) => {
 
     await cart.save();
 
-    res.status(200).json({ message: 'Item added to cart.', cart });
+    res.status(200).json({ message: 'Cart updated successfully.', cart });
 
   } catch (error) {
     console.error('Add to cart error:', error);
     res.status(500).json({ message: 'Server error.' });
   }
 };
+
 
 
 export const removeFromCart = async (req, res) => {
