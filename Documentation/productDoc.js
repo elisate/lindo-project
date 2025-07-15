@@ -190,3 +190,57 @@
  *       500:
  *         description: Internal server error
  */
+/**
+ * @swagger
+ * /product/getProductsByCategory/{categoryId}:
+ *   get:
+ *     summary: Get all products by category ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the category to filter products
+ *     responses:
+ *       200:
+ *         description: List of products for the given category
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   price:
+ *                     type: number
+ *                   category:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                   stockType:
+ *                     type: string
+ *                   quantity:
+ *                     type: integer
+ *                   shippingInfo:
+ *                     type: object
+ *                     properties:
+ *                       provider:
+ *                         type: string
+ *                       estimatedDeliveryDays:
+ *                         type: integer
+ *       404:
+ *         description: No products found for this category
+ *       500:
+ *         description: Internal server error
+ */

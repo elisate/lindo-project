@@ -5,7 +5,8 @@ import {
   getAllProducts,
   updateProduct,
   deleteProduct,
-getProductsByCreationDate
+getProductsByCreationDate,
+getProductsByCategory
 
 } from "../controllers/productController.js";
 // import { Auth } from "../utils/jwtFunction.js";
@@ -20,7 +21,6 @@ productRouter.get("/getAllProduct", getAllProducts);
 productRouter.delete("/deleteProductById/:id",deleteProduct);
 productRouter.put("/updateProductById/:id",upload,updateProduct);
 productRouter.get("/getProductsByCreationDate",getProductsByCreationDate)
-
-
+productRouter.get("/getProductsByCategory/:categoryId",getProductsByCategory)
 
 export default productRouter;

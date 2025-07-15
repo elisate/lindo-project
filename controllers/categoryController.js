@@ -11,32 +11,36 @@ cloudinary.config({
 export const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-     const files = req.files?.image || []; // or `images` if you renamed it
-    
-        if (files.length === 0) {
-          return res.status(400).json({ message: "Please upload at least one image" });
-        }
-    
-        // ✅ 2) Upload all images to Cloudinary and collect URLs
-        const uploadedImages = [];
-        for (const file of files) {
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: "products_gallery",
-          });
-          uploadedImages.push(result.secure_url);
-        }
+    const files = req.files?.image || []; // or `images` if you renamed it
+
+    if (files.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Please upload at least one image" });
+    }
+
+    // ✅ 2) Upload all images to Cloudinary and collect URLs
+    const uploadedImages = [];
+    for (const file of files) {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "products_gallery",
+      });
+      uploadedImages.push(result.secure_url);
+    }
 
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
-      return res.status(400).json({ message: 'Category already exists.' });
+      return res.status(400).json({ message: "Category already exists." });
     }
 
-    const category = new Category({ name, description,image:uploadedImages });
+    const category = new Category({ name, description, image: uploadedImages });
     await category.save();
 
-    res.status(201).json({ message: 'Category created successfully', category });
+    res
+      .status(201)
+      .json({ message: "Category created successfully", category });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -46,7 +50,7 @@ export const getAllCategories = async (req, res) => {
     const categories = await Category.find().sort({ createdAt: -1 });
     res.status(200).json({ categories });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -56,12 +60,12 @@ export const getCategoryById = async (req, res) => {
     const category = await Category.findById(req.params.id);
 
     if (!category) {
-      return res.status(404).json({ message: 'Category not found' });
+      return res.status(404).json({ message: "Category not found" });
     }
 
     res.status(200).json({ category });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -95,16 +99,15 @@ export const updateCategory = async (req, res) => {
     );
 
     if (!category) {
-      return res.status(404).json({ message: 'Category not found' });
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    res.status(200).json({ message: 'Category updated', category });
+    res.status(200).json({ message: "Category updated", category });
   } catch (error) {
-    console.error('updateCategory Error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("updateCategory Error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 // Delete a category by ID
 export const deleteCategory = async (req, res) => {
@@ -112,11 +115,31 @@ export const deleteCategory = async (req, res) => {
     const category = await Category.findByIdAndDelete(req.params.id);
 
     if (!category) {
-      return res.status(404).json({ message: 'Category not found' });
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    res.status(200).json({ message: 'Category deleted successfully' });
+    res.status(200).json({ message: "Category deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getProductsByCategoryId = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const products = await Product.find({ category: categoryId }).populate(
+      "category"
+    );
+
+    if (products.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No products found for this category." });
+    }
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
