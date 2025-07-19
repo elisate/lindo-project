@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
     image: {
-      type: Array,
+      type: [String],
       required: false,
     },
     tokens: {
