@@ -1,5 +1,5 @@
 import { createBanner,getProductsByBanner,
-    getAllBanners,getBannerById,deleteBanner,updateBanner
+    getAllBanners,getBannerById,deleteBanner,updateBanner,getCategoryByBanner
 } from "../controllers/bannerController.js";
 import express from "express"
 import { Auth } from "../utils/jwtFunction.js";
@@ -18,5 +18,6 @@ bannerRouter.get("/getBannerById/:bannerId", getBannerById);
 bannerRouter.put("/updateBanner/:bannerId", upload, updateBanner);
 
 bannerRouter.delete("/deleteBanner/:bannerId", deleteBanner);
+bannerRouter.get("/getCategoryByBanner/:bannerId", getCategoryByBanner);
 
 export default bannerRouter;

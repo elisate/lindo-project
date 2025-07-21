@@ -45,8 +45,6 @@ export const createBanner = async (req, res) => {
   }
 };
 
-
-
 export const getProductsByBanner = async (req, res) => {
   try {
     const { bannerId } = req.params;
@@ -88,15 +86,21 @@ export const getProductsByBanner = async (req, res) => {
 };
 
 
+
+
 /** ✅ READ ALL Banners **/
 export const getAllBanners = async (req, res) => {
   try {
-    const banners = await Banner.find().populate('category');
+    const banners = await Banner.find()
+      .populate('category')
+      .sort({ createdAt: -1 }); // ✅ Sort by newest first
+
     res.status(200).json({ banners });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 /** ✅ READ ONE Banner **/
@@ -193,3 +197,22 @@ export const deleteBanner = async (req, res) => {
 };
 
 
+export const getCategoryByBanner = async (req, res) => {
+  try {
+    const { bannerId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(bannerId)) {
+      return res.status(400).json({ message: "Invalid banner ID." });
+    }
+
+    const banner = await Banner.findById(bannerId).populate('category');
+    if (!banner) {
+      return res.status(404).json({ message: "Banner not found." });
+    }
+
+    res.status(200).json({ category: banner.category });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
