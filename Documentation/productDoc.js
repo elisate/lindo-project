@@ -32,13 +32,10 @@
  *                   format: binary
  *               name:
  *                 type: string
- *                 example: iPhone 15 Pro Max
  *               description:
  *                 type: string
- *                 example: Latest Apple smartphone
  *               price:
  *                 type: number
- *                 example: 1299.99
  *               category:
  *                 type: string
  *               stockType:
@@ -51,10 +48,8 @@
  *                 properties:
  *                   provider:
  *                     type: string
- *                     example: DHL
  *                   estimatedDeliveryDays:
  *                     type: integer
- *                     example: 3
  *     responses:
  *       201:
  *         description: Product created successfully
@@ -106,12 +101,32 @@
  */
 
 /**
- * 
+ * @swagger
+ * /product/getProductById/{id}:
+ *   get:
+ *     summary: Get product details by ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The product ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product details
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Internal server error
+ */
+
 /**
  * @swagger
  * /product/updateProductById/{id}:
  *   put:
- *     summary: Update an existing product by ID, including optional new images
+ *     summary: Update an existing product by ID
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
@@ -131,35 +146,26 @@
  *             properties:
  *               name:
  *                 type: string
- *                 example: New Product Name
  *               description:
  *                 type: string
- *                 example: Updated product description
  *               price:
  *                 type: number
- *                 example: 49.99
  *               category:
  *                 type: string
- *                 example: 64b1234abcd5678ef90123gh
  *               stockType:
  *                 type: string
  *                 enum: [in_store, virtual_stock]
- *                 example: in_store
  *               quantity:
  *                 type: integer
- *                 example: 100
  *               shippingProvider:
  *                 type: string
- *                 example: DHL
  *               estimatedDeliveryDays:
  *                 type: integer
- *                 example: 5
  *               image:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: One or more new product images
  *     responses:
  *       200:
  *         description: Product updated successfully
@@ -168,6 +174,7 @@
  *       500:
  *         description: Internal server error
  */
+
 /**
  * @swagger
  * /product/getProductsByCreationDate:
@@ -190,6 +197,7 @@
  *       500:
  *         description: Internal server error
  */
+
 /**
  * @swagger
  * /product/getProductsByCategory/{categoryId}:
