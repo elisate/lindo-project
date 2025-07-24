@@ -3,7 +3,7 @@ import passport from "../config/passportGoogle.js";
 export const googleAuth = passport.authenticate("google", {
   scope: ["profile", "email"],
 });
-
+// refined Google Authentication
 export const googleAuthCallback = (req, res, next) => {
   passport.authenticate("google", (err, user, info) => {
     if (err) {
