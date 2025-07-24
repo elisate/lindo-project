@@ -1,4 +1,3 @@
-// config/passportGoogle.js
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
@@ -16,19 +15,14 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
-
         let user = await User.findOne({ email });
 
-        if (user) {
-          // ✅ If found, log them in.
-          return done(null, user);
-        }
+        if (user) return done(null, user);
 
-        // ✅ If not found, create new
         user = await User.create({
           firstName: profile.name.givenName || "N/A",
           lastName: profile.name.familyName || "N/A",
-          email: email,
+          email,
           password: "google-oauth",
           gender: "N/A",
           image: [profile.photos[0].value],
@@ -44,8 +38,6 @@ passport.use(
   )
 );
 
-
-// ✅ Session serialization
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });

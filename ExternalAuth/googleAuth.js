@@ -1,4 +1,3 @@
-// controllers/googleAuth.js
 import passport from "../config/passportGoogle.js";
 
 export const googleAuth = passport.authenticate("google", {
@@ -10,23 +9,24 @@ export const googleAuthCallback = (req, res, next) => {
     if (err) {
       return res.status(500).send("Error: " + err.message);
     }
+
     if (!user) {
-      // ✅ If user is false, show the reason
-      return res.redirect("/login?error=" + encodeURIComponent(info?.message || "Login failed"));
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=Login Failed`);
     }
 
-    // ✅ If user found or created, log them in
     req.login(user, (loginErr) => {
       if (loginErr) {
         return res.status(500).send("Login error");
       }
-      return res.redirect("/");
+
+      // ✅ Redirect to frontend with user ID
+      return res.redirect(`${process.env.FRONTEND_URL}?user=${user._id}`);
     });
   })(req, res, next);
 };
 
 export const logout = (req, res) => {
   req.logout(() => {
-    res.redirect("/");
+    res.redirect(process.env.FRONTEND_URL);
   });
 };
