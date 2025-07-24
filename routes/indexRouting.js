@@ -21,5 +21,5 @@ mainRouter.use("/auth",googleRouter);
 mainRouter.use("/adds",addRouter);
 mainRouter.use("/icons",iconRouter)
 mainRouter.use("/orders",orderRouter)
-mainRouter.use("/",resetRouter);
+mainRouter.use("/reset",resetRouter);
 export default mainRouter;

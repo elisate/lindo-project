@@ -22,7 +22,7 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     // Prepare link
-    const resetLink = `http://localhost:3000/reset-password/${token}`;
+    const resetLink = `http://localhost:3000/rest/reset-password/${token}`;
     const subject = "Password Reset";
     const html = `
       <h2>Password Reset Request</h2>
