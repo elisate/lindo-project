@@ -9,6 +9,7 @@ import googleRouter from "./googleAuthPaths.js";
 import addRouter from "./addPaths.js";
 import iconRouter from "./iconPaths.js";
 import orderRouter from "./orderPaths.js";
+import resetRouter from "./resetPasswordPaths.js";
 const mainRouter=express.Router();
 mainRouter.use("/user",userRouter);
 mainRouter.use("/category",categoryRouter);
@@ -20,4 +21,5 @@ mainRouter.use("/auth",googleRouter);
 mainRouter.use("/adds",addRouter);
 mainRouter.use("/icons",iconRouter)
 mainRouter.use("/orders",orderRouter)
+mainRouter.use("/",resetRouter);
 export default mainRouter;
