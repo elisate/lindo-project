@@ -10,6 +10,7 @@ import addRouter from "./addPaths.js";
 import iconRouter from "./iconPaths.js";
 import orderRouter from "./orderPaths.js";
 import resetRouter from "./resetPasswordPaths.js";
+import pesapalRouter from "./pesapalPaths.js";
 const mainRouter=express.Router();
 mainRouter.use("/user",userRouter);
 mainRouter.use("/category",categoryRouter);
@@ -22,4 +23,6 @@ mainRouter.use("/adds",addRouter);
 mainRouter.use("/icons",iconRouter)
 mainRouter.use("/orders",orderRouter)
 mainRouter.use("/reset",resetRouter);
+
+mainRouter.use("/pesapal",pesapalRouter);
 export default mainRouter;
