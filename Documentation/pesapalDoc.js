@@ -33,10 +33,10 @@
  *                 example: 1000
  *               currency:
  *                 type: string
- *                 example: "KES"
+ *                 example: "RW"
  *               phone:
  *                 type: string
- *                 example: "+254712345678"
+ *                 example: "+250787239952"
  *               email:
  *                 type: string
  *                 example: "customer@example.com"
