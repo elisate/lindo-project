@@ -1,83 +1,53 @@
 import Order from '../models/orderModel.js';
 import { submitPesapalOrder } from '../utils/pesapalService.js';
-
-/**
- * Map payment status from Pesapal to your order status
- */
-const getMappedStatus = (paymentStatus) => {
-  switch (paymentStatus) {
-    case 'COMPLETED':
-      return { orderStatus: 'paid', pesapalStatus: 'COMPLETED' };
-    case 'FAILED':
-    case 'CANCELLED':
-      return { orderStatus: 'cancelled', pesapalStatus: paymentStatus };
-    default:
-      return { orderStatus: 'pending', pesapalStatus: 'PENDING' };
-  }
+import { registerIPN } from "../utils/pesapalService.js";
+// Utility to map Pesapal status to internal order status
+const getMappedStatus = (status) => {
+  const statusMap = {
+    COMPLETED: { orderStatus: 'paid', pesapalStatus: 'COMPLETED' },
+    FAILED: { orderStatus: 'cancelled', pesapalStatus: 'FAILED' },
+    CANCELLED: { orderStatus: 'cancelled', pesapalStatus: 'CANCELLED' },
+  };
+  return statusMap[status] || { orderStatus: 'pending', pesapalStatus: 'PENDING' };
 };
 
-/**
- * Initialize Pesapal Payment
- */
+// Main payment initiation handler
 export const initiatePayment = async (req, res) => {
   try {
-    const {
-      orderID,
-      amount,
-      currency,
-      phone,
-      email,
-      firstName,
-      lastName,
-    } = req.body;
+    // 1. Register IPN (ideally once — you can cache the result)
+    const ipnData = await registerIPN();
 
-    // Validate required fields
-    if (!orderID || !amount || !currency || !phone || !email || !firstName || !lastName) {
-      return res.status(400).json({ message: 'Missing required payment fields' });
-    }
-
-    // Find the order by ID
-    const order = await Order.findById(orderID);
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    // Prepare payment data
-    const paymentData = {
-      amount,
-      currency,
-      phone,
-      email,
-      firstName,
-      lastName,
-      callbackUrl: `${req.protocol}://${req.get('host')}/api/pesapal/callback`, // Your callback endpoint
-      description: `Payment for order ${orderID}`,
+    // 2. Add IPN ID to the order
+    const order = {
+      orderID: req.body.orderID,
+      amount: req.body.amount,
+      currency: "RWF",
+      phone: req.body.phone,
+      email: req.body.email,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      ipn_id: ipnData.ipn_id, // REQUIRED!
     };
 
-    // Submit order to Pesapal
-    const pesapalResponse = await submitPesapalOrder(paymentData);
-
-    // Save Pesapal details to order
-    order.pesapalOrderTrackingId = pesapalResponse.order_tracking_id;
-    order.pesapalMerchantRequestId = pesapalResponse.merchant_reference;
-    order.pesapalRedirectUrl = pesapalResponse.redirect_url;
-    order.paymentMethod = 'pesapal';
-    await order.save();
+    // 3. Submit the Order
+    const response = await submitPesapalOrder(order);
 
     return res.status(200).json({
-      message: 'Payment initiated successfully',
-      redirectUrl: pesapalResponse.redirect_url,
-      orderTrackingId: pesapalResponse.order_tracking_id,
+      success: true,
+      message: "Payment initiated successfully.",
+      redirect_url: response.redirect_url,
+      tracking_id: response.order_tracking_id,
     });
   } catch (error) {
-    console.error('Pesapal Error:', error?.response?.data || error.message);
-    return res.status(500).json({ message: 'Failed to initiate payment', error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to initiate payment.",
+      error: error.response?.data || error.message,
+    });
   }
 };
 
-/**
- * Handle Pesapal Callback
- */
+// Step 4: Pesapal Callback Handler (after payment UI)
 export const pesapalCallback = async (req, res) => {
   try {
     const {
@@ -97,23 +67,25 @@ export const pesapalCallback = async (req, res) => {
 
     const { orderStatus, pesapalStatus } = getMappedStatus(pesapal_payment_status_description);
 
-    await Order.findByIdAndUpdate(order._id, {
-      status: orderStatus,
-      pesapalPaymentStatus: pesapalStatus,
-      pesapalOrderTrackingId: pesapal_transaction_tracking_id,
-    });
+    order.status = orderStatus;
+    order.pesapalPaymentStatus = pesapalStatus;
+    order.pesapalOrderTrackingId = pesapal_transaction_tracking_id;
+    await order.save();
 
-    // Redirect to your frontend payment status page
     return res.redirect(`${process.env.FRONTEND_URL}/payment/status?status=${pesapalStatus}&orderId=${order._id}`);
   } catch (error) {
-    console.error('Pesapal callback error:', error);
-    return res.status(500).json({ success: false, message: 'Pesapal callback failed.', error: error.message });
+    console.error('Pesapal Callback Error:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Pesapal callback failed.',
+      error: error.message,
+    });
   }
 };
 
-/**
- * Handle IPN notifications from Pesapal
- */
+
+// IPN Handler
+// Step 5: IPN Notification Listener
 export const handleIPN = async (req, res) => {
   try {
     const {
@@ -122,30 +94,60 @@ export const handleIPN = async (req, res) => {
       pesapal_payment_status_description,
     } = req.body;
 
-    console.log('Pesapal IPN received:', req.body);
-
     if (!pesapal_merchant_reference) {
-      return res.status(400).json({ success: false, message: 'Missing merchant reference' });
+      return res.status(400).json({ success: false, message: 'Missing merchant reference.' });
     }
 
     const order = await Order.findOne({ pesapalMerchantRequestId: pesapal_merchant_reference });
     if (!order) {
-      console.log(`No order found for merchant ref: ${pesapal_merchant_reference}`);
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      console.warn(`No order found for merchant reference: ${pesapal_merchant_reference}`);
+      return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
     const { orderStatus, pesapalStatus } = getMappedStatus(pesapal_payment_status_description);
 
-    await Order.findByIdAndUpdate(order._id, {
-      status: orderStatus,
-      pesapalPaymentStatus: pesapalStatus,
-      pesapalOrderTrackingId: pesapal_transaction_tracking_id,
+    order.status = orderStatus;
+    order.pesapalPaymentStatus = pesapalStatus;
+    order.pesapalOrderTrackingId = pesapal_transaction_tracking_id;
+    await order.save();
+
+    console.log(`IPN processed: Order ${order._id} updated to ${orderStatus}`);
+    return res.status(200).json({ success: true, message: 'IPN processed successfully.' });
+  } catch (error) {
+    console.error('Pesapal IPN Error:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to process IPN.',
+      error: error.message,
+    });
+  }
+};
+
+
+// import { queryPaymentStatus } from '../utils/pesapalService.js';
+
+export const checkPesapalPaymentStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+    if (!order || !order.pesapalOrderTrackingId) {
+      return res.status(404).json({ success: false, message: 'Order or tracking ID not found.' });
+    }
+
+    const result = await queryPaymentStatus({
+      merchantReference: order.pesapalMerchantRequestId,
+      trackingId: order.pesapalOrderTrackingId,
     });
 
-    console.log(`Order ${order._id} updated to ${orderStatus}`);
-    return res.status(200).json({ success: true, message: 'IPN processed.' });
+    const { orderStatus, pesapalStatus } = getMappedStatus(result.status_description);
+    order.status = orderStatus;
+    order.pesapalPaymentStatus = pesapalStatus;
+    await order.save();
+
+    return res.status(200).json({ success: true, status: pesapalStatus });
   } catch (error) {
-    console.error('IPN error:', error);
-    return res.status(500).json({ success: false, message: 'IPN handler failed.', error: error.message });
+    console.error('Query Status Error:', error.message);
+    return res.status(500).json({ success: false, message: 'Failed to query payment status.', error: error.message });
   }
 };
