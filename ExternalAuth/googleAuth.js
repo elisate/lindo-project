@@ -18,7 +18,7 @@ export const googleAuthCallback = (req, res, next) => {
       if (loginErr) {
         return res.status(500).send("Login error");
       }
-
+//refined Google Auth
       // ✅ Redirect to frontend with user ID
       return res.redirect(`${process.env.FRONTEND_URL}?user=${user._id}`);
     });
