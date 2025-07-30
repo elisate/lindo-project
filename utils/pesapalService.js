@@ -1,81 +1,65 @@
-import axios from "axios";
-import { pesapalConfig, getPesapalUrl } from "../config/pesapalConfig.js";
-
-let cachedToken = null;
+import axios from 'axios';
+import { pesapalConfig, getPesapalUrl } from '../config/pesapalConfig.js';
+import qs from 'querystring';
 
 export const getAccessToken = async () => {
-  if (cachedToken) return cachedToken;
-
-  const url = getPesapalUrl("token");
-  const auth = {
+  const url = getPesapalUrl('token');
+  const credentials = {
     consumer_key: pesapalConfig.consumerKey,
     consumer_secret: pesapalConfig.consumerSecret,
   };
 
-  try {
-    const res = await axios.post(url, auth);
-    cachedToken = res.data.token;
-    return cachedToken;
-  } catch (error) {
-    console.error("AccessToken Error:", error.response?.data || error.message);
-    throw error;
-  }
+  const headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+
+  const response = await axios.post(url, qs.stringify(credentials), { headers });
+  return response.data?.token;
 };
 
 export const registerIPN = async () => {
-  const url = getPesapalUrl("registerIPN");
   const token = await getAccessToken();
+  const url = getPesapalUrl('register_ipn');
 
-  try {
-    const res = await axios.post(
-      url,
-      {
-        url: pesapalConfig.callbackUrl,
-        ipn_notification_type: "GET",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  const payload = {
+    url: pesapalConfig.notificationUrl,
+    ipn_notification_type: 'GET',
+  };
 
-    return res.data;
-  } catch (error) {
-    console.error("IPN Register Error:", error.response?.data || error.message);
-    throw error;
-  }
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+
+  const response = await axios.post(url, payload, { headers });
+  return response.data?.ipn_id;
 };
 
 export const submitPesapalOrder = async (orderData) => {
-  const url = getPesapalUrl("submitOrder");
   const token = await getAccessToken();
+  const url = getPesapalUrl('submit_order');
 
   const payload = {
     id: orderData.orderID,
-    currency: orderData.currency || "RWF",
+    currency: orderData.currency || 'RWF',
     amount: orderData.amount,
-    description: "Purchase at Future Focus Rwanda",
+    description: 'Purchase at Lindos ',
     callback_url: pesapalConfig.callbackUrl,
-    notification_id: orderData.ipn_id, // This must come from registerIPN
+    notification_id: orderData.ipn_id,
     billing_address: {
       email_address: orderData.email,
       phone_number: orderData.phone,
       first_name: orderData.firstName,
       last_name: orderData.lastName,
     },
+    merchant_reference: orderData.merchant_reference, // ✅ REQUIRED
   };
 
-  try {
-    const res = await axios.post(url, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
 
-    return res.data;
-  } catch (error) {
-    console.error("Pesapal Error:", error.response?.data || error.message);
-    throw error;
-  }
+  const response = await axios.post(url, payload, { headers });
+  return response.data;
 };
