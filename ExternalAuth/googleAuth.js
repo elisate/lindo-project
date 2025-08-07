@@ -1,6 +1,6 @@
 import passport from "../config/passportGoogle.js";
 import jwt from "jsonwebtoken";
-
+// fic URL
 export const googleAuth = passport.authenticate("google", {
   scope: ["profile", "email"],
 });
