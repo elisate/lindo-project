@@ -21,7 +21,6 @@
  *             type: object
  *             required:
  *               - paymentMethod
- *               - shippingAddress
  *               - customerEmail
  *               - customerPhone
  *               - customerName
@@ -31,18 +30,36 @@
  *                 enum: [cash, card, mobile, pesapal]
  *                 example: pesapal
  *               shippingAddress:
- *                 type: string
- *                 example: "Kigali, Rwanda"
+ *                 type: object
+ *                 properties:
+ *                   province:
+ *                     type: string
+ *                     example: Kigali City
+ *                   district:
+ *                     type: string
+ *                     example: Gasabo
+ *                   sector:
+ *                     type: string
+ *                     example: Kimironko
+ *                   cell:
+ *                     type: string
+ *                     example: Kicukiro
+ *                   village:
+ *                     type: string
+ *                     example: Nyabisindu
+ *                   street:
+ *                     type: string
+ *                     example: Street 12
  *               customerEmail:
  *                 type: string
  *                 format: email
- *                 example: "customer@example.com"
+ *                 example: customer@example.com
  *               customerPhone:
  *                 type: string
- *                 example: "+250788123456"
+ *                 example: +250788123456
  *               customerName:
  *                 type: string
- *                 example: "John Doe"
+ *                 example: John Doe
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -53,14 +70,14 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Order created successfully."
+ *                   example: Order created successfully.
  *                 order:
  *                   $ref: '#/components/schemas/Order'
  *                 redirectUrl:
  *                   type: string
  *                   nullable: true
- *                   description: "Redirect URL for payment if using Pesapal"
- *                   example: "https://pesapal.com/redirect/payment-url"
+ *                   description: Redirect URL for payment if using Pesapal or DPO
+ *                   example: https://secure.3gdirectpay.com/payv3.php?ID=abc123
  *       400:
  *         description: Cart is empty or invalid input
  *         content:
@@ -70,7 +87,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Cart is empty."
+ *                   example: Cart is empty.
  *       500:
  *         description: Internal server error
  *         content:
@@ -80,7 +97,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error."
+ *                   example: Internal server error.
  */
 
 /**
@@ -112,7 +129,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Could not retrieve orders."
+ *                   example: Could not retrieve orders.
  */
 
 /**
@@ -144,7 +161,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to get all orders."
+ *                   example: Failed to get all orders.
  */
 
 /**
@@ -161,7 +178,7 @@
  *         productId:
  *           type: string
  *           description: The unique ID of the product
- *           example: "64a21f1b2fd01a3ef2a21aab"
+ *           example: 64a21f1b2fd01a3ef2a21aab
  *         quantity:
  *           type: integer
  *           description: Quantity ordered
@@ -171,17 +188,38 @@
  *           format: float
  *           description: Price per item
  *           example: 49.99
+ *     ShippingAddress:
+ *       type: object
+ *       properties:
+ *         province:
+ *           type: string
+ *           example: Kigali City
+ *         district:
+ *           type: string
+ *           example: Gasabo
+ *         sector:
+ *           type: string
+ *           example: Kimironko
+ *         cell:
+ *           type: string
+ *           example: Kicukiro
+ *         village:
+ *           type: string
+ *           example: Nyabisindu
+ *         street:
+ *           type: string
+ *           example: Street 12
  *     Order:
  *       type: object
  *       properties:
  *         _id:
  *           type: string
  *           description: Order unique ID
- *           example: "64a9f3e26d0c6b1d88712345"
+ *           example: 64a9f3e26d0c6b1d88712345
  *         userId:
  *           type: string
  *           description: User who placed the order
- *           example: "64a21f1b2fd01a3ef2a21aac"
+ *           example: 64a21f1b2fd01a3ef2a21aac
  *         items:
  *           type: array
  *           description: List of products in the order
@@ -200,30 +238,29 @@
  *           enum: [cash, card, mobile, pesapal]
  *           example: pesapal
  *         shippingAddress:
- *           type: string
- *           example: "Kigali, Rwanda"
+ *           $ref: '#/components/schemas/ShippingAddress'
  *         customerEmail:
  *           type: string
  *           format: email
- *           example: "customer@example.com"
+ *           example: customer@example.com
  *         customerPhone:
  *           type: string
- *           example: "+250788123456"
+ *           example: +250788123456
  *         customerName:
  *           type: string
- *           example: "John Doe"
- *         pesapalOrderTrackingId:
+ *           example: John Doe
+ *         dpoTransactionToken:
  *           type: string
  *           nullable: true
- *           example: "ABC123456789"
- *         pesapalMerchantRequestId:
+ *           example: "9CFEF689-4802-4A9F-8E85-620BD062A68A"
+ *         dpoRedirectUrl:
  *           type: string
  *           nullable: true
- *           example: "XYZ987654321"
- *         pesapalRedirectUrl:
+ *           example: "https://secure.3gdirectpay.com/payv3.php?ID=9CFEF689-4802-4A9F-8E85-620BD062A68A"
+ *         dpoPaymentStatus:
  *           type: string
- *           nullable: true
- *           example: "https://pesapal.com/redirect/payment-url"
+ *           enum: [PENDING, COMPLETED, FAILED, CANCELLED]
+ *           example: PENDING
  *         createdAt:
  *           type: string
  *           format: date-time
