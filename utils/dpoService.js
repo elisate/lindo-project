@@ -40,14 +40,31 @@ export const createPaymentToken = async (paymentData) => {
 
 export const verifyPaymentToken = async (token) => {
   const payload = {
-    CompanyToken: DPO_CONFIG.companyToken,
-    TransactionToken: token,
+    API3G: {
+      CompanyToken: DPO_CONFIG.companyToken,
+      Request: "verifyToken",
+      TransactionToken: token,
+    },
   };
 
-  const res = await axios.post(`${DPO_CONFIG.endpoint}verify`, payload, {
-    headers: { "Content-Type": "application/json" },
+  const builder = new Builder({ headless: true });
+  const xmlPayload = builder.buildObject(payload);
+
+  const res = await axios.post(`${DPO_CONFIG.endpoint}verify`, xmlPayload, {
+    headers: { "Content-Type": "text/xml" },
   });
-  return res.data;
+
+  const xml = res.data;
+
+  // Optional: Use regex to extract values quickly
+  const resultMatch = xml.match(/<Result>(.*?)<\/Result>/);
+  const explanationMatch = xml.match(/<ResultExplanation>(.*?)<\/ResultExplanation>/);
+
+  return {
+    Result: resultMatch ? resultMatch[1] : null,
+    ResultExplanation: explanationMatch ? explanationMatch[1] : "Unknown",
+    RawResponse: xml,
+  };
 };
 
 export const getPaymentRedirectUrl = (token) => {
