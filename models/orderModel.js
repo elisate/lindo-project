@@ -39,7 +39,14 @@ const orderSchema = new mongoose.Schema({
   pesapalRedirectUrl: String,
   customerEmail: String,
   customerPhone: String,
-  customerName: String
+  customerName: String,
+  dpoTransactionToken: { type: String },
+  dpoRedirectUrl: { type: String },
+  dpoPaymentStatus: {
+    type: String,
+    enum: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'],
+    default: 'PENDING',
+  },
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

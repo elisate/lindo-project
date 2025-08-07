@@ -1,5 +1,5 @@
-import express from "express"
-import userRouter from "./userPaths.js"
+import express from "express";
+import userRouter from "./userPaths.js";
 import categoryRouter from "./categoryPaths.js";
 import productRouter from "./productPath.js";
 import cartRouter from "./cartPaths.js";
@@ -11,18 +11,20 @@ import iconRouter from "./iconPaths.js";
 import orderRouter from "./orderPaths.js";
 import resetRouter from "./resetPasswordPaths.js";
 import pesapalRouter from "./pesapalPaths.js";
-const mainRouter=express.Router();
-mainRouter.use("/user",userRouter);
-mainRouter.use("/category",categoryRouter);
-mainRouter.use("/product",productRouter);
-mainRouter.use("/cart",cartRouter);
-mainRouter.use("/banner",bannerRouter);
-mainRouter.use("/wishlist",wishlistRouter);
-mainRouter.use("/auth",googleRouter);
-mainRouter.use("/adds",addRouter);
-mainRouter.use("/icons",iconRouter)
-mainRouter.use("/orders",orderRouter)
-mainRouter.use("/reset",resetRouter);
+import dpoRouter from "./dpoPaths.js";
+const mainRouter = express.Router();
+mainRouter.use("/user", userRouter);
+mainRouter.use("/category", categoryRouter);
+mainRouter.use("/product", productRouter);
+mainRouter.use("/cart", cartRouter);
+mainRouter.use("/banner", bannerRouter);
+mainRouter.use("/wishlist", wishlistRouter);
+mainRouter.use("/auth", googleRouter);
+mainRouter.use("/adds", addRouter);
+mainRouter.use("/icons", iconRouter);
+mainRouter.use("/orders", orderRouter);
+mainRouter.use("/reset", resetRouter);
 
-mainRouter.use("/pesapal",pesapalRouter);
+mainRouter.use("/pesapal", pesapalRouter);
+mainRouter.use("/dpo", dpoRouter);
 export default mainRouter;
