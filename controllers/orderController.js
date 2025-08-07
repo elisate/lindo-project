@@ -17,13 +17,29 @@ export const createOrder = async (req, res) => {
       0
     );
 
+    // Destructure additional address fields from req.body
     const {
-      shippingAddress,
+      province,
+      district,
+      sector,
+      cell,
+      village,
+      street,
       paymentMethod,
       customerEmail,
       customerPhone,
       customerName,
     } = req.body;
+
+    // Construct shippingAddress subdocument
+    const shippingAddress = {
+      province,
+      district,
+      sector,
+      cell,
+      village,
+      street,
+    };
 
     const order = new Order({
       userId,
@@ -32,8 +48,8 @@ export const createOrder = async (req, res) => {
         quantity: item.quantity,
         price: item.price,
       })),
-      totalAmount, // Use totalAmount instead of amount
-      shippingAddress,
+      totalAmount,
+      shippingAddress,  // <-- set the new structured address here
       paymentMethod,
       customerEmail,
       customerPhone,
@@ -83,6 +99,7 @@ export const createOrder = async (req, res) => {
     res.status(500).json({ message: 'Internal server error.' });
   }
 };
+
 
 export const getUserOrders = async (req, res) => {
   try {

@@ -15,31 +15,25 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
   },
- user: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: 'User',
-  required: false,
-},
-
-
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  },
   paymentMethod: {
     type: String,
-    enum: ['cash', 'card', 'mobile', 'pesapal'],
+    enum: ['cash', 'card', 'mobile', 'pesapal', 'dpo'], // Added 'dpo' since you use it
     default: 'cash'
   },
-  shippingAddress: String,
-  // Pesapal fields
-  pesapalOrderTrackingId: String,
-  pesapalMerchantRequestId: String,
-  pesapalPaymentStatus: {
-    type: String,
-    enum: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'],
-    default: 'PENDING'
+  shippingAddress: {
+    province: { type: String, required: false },
+    district: { type: String, required: false },
+    sector: { type: String, required: false },
+    cell: { type: String, required: false },
+    village: { type: String, required: false },
+    street: { type: String, required: false },
   },
-  pesapalRedirectUrl: String,
-  customerEmail: String,
-  customerPhone: String,
-  customerName: String,
+  // DPO fields
   dpoTransactionToken: { type: String },
   dpoRedirectUrl: { type: String },
   dpoPaymentStatus: {
