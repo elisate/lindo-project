@@ -5,8 +5,8 @@ const dpoRouter = express.Router(); // Correct usage of Router
 import { Auth } from '../utils/jwtFunction.js';
 
 // Step 2 & 3: Initiate Pesapal payment
-dpoRouter.post('/initialize/dpoPayment',Auth, initiateDpoPayment);
+dpoRouter.post('/initialize/dpoPayment',initiateDpoPayment);
 
-dpoRouter.post('/verify/dpoPayment', Auth, verifyDpoPayment);
+dpoRouter.post('/verify/dpoPayment',verifyDpoPayment);
 
 export default dpoRouter;
