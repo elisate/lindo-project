@@ -1,3 +1,4 @@
+
 /**
  * @swagger
  * tags:
@@ -11,8 +12,6 @@
  *   post:
  *     summary: Initialize a DPO payment
  *     tags: [DPO Payments]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -69,14 +68,13 @@
  *         description: Server error
  */
 
+
 /**
  * @swagger
  * /dpo/verify/dpoPayment:
  *   post:
  *     summary: Verify DPO payment using token
  *     tags: [DPO Payments]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
